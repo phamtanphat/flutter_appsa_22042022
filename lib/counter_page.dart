@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CounterPage extends StatefulWidget {
@@ -14,7 +15,32 @@ class _CounterPageState extends State<CounterPage> {
       appBar: AppBar(
         title: Text("Counter Bloc"),
       ),
-      body: Container(),
+      body: Container(
+        constraints: BoxConstraints.expand(),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(onPressed: (){
+
+              }, child: Text("+")),
+              TextWidget(),
+              ElevatedButton(onPressed: (){
+
+              }, child: Text("-")),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
+
+class TextWidget extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return Text("Count : 0");
+  }
+}
+
