@@ -1,14 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_appsa_22042022/counter_bloc.dart';
+import 'package:flutter_appsa_22042022/counter_event.dart';
 
 class CounterPage extends StatefulWidget {
-  const CounterPage({Key? key}) : super(key: key);
 
   @override
   State<CounterPage> createState() => _CounterPageState();
 }
 
 class _CounterPageState extends State<CounterPage> {
+
+  late CounterBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = CounterBloc();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +31,7 @@ class _CounterPageState extends State<CounterPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(onPressed: (){
-
+                _bloc.eventController.sink.add(IncreaseEvent(value: 1));
               }, child: Text("+")),
               TextWidget(),
               ElevatedButton(onPressed: (){
