@@ -14,10 +14,11 @@ class _CounterPageState extends State<CounterPage> {
   late CounterBloc _bloc;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
     _bloc = CounterBloc();
+    super.didChangeDependencies();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +34,18 @@ class _CounterPageState extends State<CounterPage> {
               ElevatedButton(onPressed: (){
                 _bloc.eventController.sink.add(IncreaseEvent(value: 1));
               }, child: Text("+")),
-              TextWidget(),
+              StreamBuilder<int>(
+                  initialData: 0,
+                  stream: _bloc.countController.stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData){
+                      return Text("Count: ${snapshot.data}");
+                    } else if (snapshot.hasError) {
+                      return Text("Error");
+                    }
+                    return Text("Count:");
+                  }
+              ),
               ElevatedButton(onPressed: (){
 
               }, child: Text("-")),
