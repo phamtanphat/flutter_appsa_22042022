@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_appsa_22042022/common/bases/base_widget.dart';
+import 'package:flutter_appsa_22042022/data/repositories/authentication_repository.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -33,6 +34,12 @@ class _SignInContainerState extends State<SignInContainer> {
   final _passController = TextEditingController();
   var isPassVisible = true;
 
+  @override
+  void didUpdateWidget(covariant SignInContainer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    AuthenticationRepository repository = AuthenticationRepository();
+
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(

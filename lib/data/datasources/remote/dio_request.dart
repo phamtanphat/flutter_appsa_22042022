@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_appsa_22042022/common/constants/api_constant.dart';
 
 class DioRequest {
   Dio? _dio;
   static BaseOptions _options = new BaseOptions(
-    baseUrl: "https://freeapi.code4func.com/api/v1/",
-    connectTimeout: 5000,
-    receiveTimeout: 3000,
+    baseUrl: ApiConstant.BASE_URL,
+    connectTimeout: 30000,
+    receiveTimeout: 30000,
   );
 
   static final DioRequest instance = DioRequest._internal();
