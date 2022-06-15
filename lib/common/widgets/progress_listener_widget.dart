@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_appsa_22042022/commons/base/base_bloc.dart';
-import 'package:flutter_appsa_22042022/commons/base/base_event.dart';
+import 'package:flutter_appsa_22042022/common/bases/base_bloc.dart';
+import 'package:flutter_appsa_22042022/common/bases/base_event.dart';
 import 'package:provider/provider.dart';
 
 class ProgressListenerWidget<T extends BaseBloc> extends StatefulWidget {

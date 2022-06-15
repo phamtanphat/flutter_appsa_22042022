@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_appsa_22042022/commons/base/base_widget.dart';
+import 'package:flutter_appsa_22042022/common/bases/base_widget.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
