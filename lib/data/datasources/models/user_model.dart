@@ -1,8 +1,8 @@
 class UserModel {
-  String email;
-  String name;
-  String phone;
-  String token;
+  String email = "";
+  String name = "";
+  String phone = "";
+  String token = "";
 
   UserModel({
       required this.email,
