@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_appsa_22042022/common/bases/base_widget.dart';
+import 'package:flutter_appsa_22042022/common/widgets/loading_widget.dart';
+import 'package:flutter_appsa_22042022/common/widgets/progress_listener_widget.dart';
+import 'package:flutter_appsa_22042022/data/repositories/authentication_repository.dart';
+import 'package:flutter_appsa_22042022/presentation/features/sign_up/sign_up_bloc.dart';
+import 'package:flutter_appsa_22042022/presentation/features/sign_up/sign_up_event.dart';
+import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -12,7 +18,16 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return PageContainer(
-      providers: [],
+      providers: [
+        Provider(create: (context) => AuthenticationRepository()),
+        ProxyProvider<AuthenticationRepository, SignUpBloc>(
+            create: (context) => SignUpBloc(),
+            update: (context, repository, bloc) {
+              bloc!.setAuthenticationRepository(
+                  authenticationRepository: repository);
+              return bloc;
+            })
+      ],
       appBar: AppBar(
         title: Text("Sign Up"),
       ),
@@ -29,53 +44,73 @@ class SignUpContainer extends StatefulWidget {
 }
 
 class _SignUpContainerState extends State<SignUpContainer> {
-  final _displayController = TextEditingController();
+  final _displayNameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passController = TextEditingController();
   final _emailController = TextEditingController();
   final _addressController = TextEditingController();
+  late SignUpBloc _bloc;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _bloc = context.read();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
         color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Expanded(
-                flex: 2, child: Image.asset("assets/images/ic_hello_food.png")),
-            Expanded(
-                flex: 4,
-                child: LayoutBuilder(
-                  builder: (context, constraint) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints:
-                            BoxConstraints(minHeight: constraint.maxHeight),
-                        child: IntrinsicHeight(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              _buildDisplayTextField(),
-                              SizedBox(height: 10),
-                              _buildAddressTextField(),
-                              SizedBox(height: 10),
-                              _buildEmailTextField(),
-                              SizedBox(height: 10),
-                              _buildPhoneTextField(),
-                              SizedBox(height: 10),
-                              _buildPasswordTextField(),
-                              SizedBox(height: 10),
-                              _buildButtonSignUp()
-                            ],
+        child: LoadingWidget(
+          bloc: _bloc,
+          child: ProgressListenerWidget<SignUpBloc>(
+            callback: (event) {
+              if (event is SignUpSuccessEvent) {
+                String email = _emailController.text.toString();
+                String password = _passController.text.toString();
+                Navigator.pop(context,{'email': email, 'password': password});
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Sign Up Success")));
+              }
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                    flex: 2, child: Image.asset("assets/images/ic_hello_food.png")),
+                Expanded(
+                    flex: 4,
+                    child: LayoutBuilder(
+                      builder: (context, constraint) {
+                        return SingleChildScrollView(
+                          child: ConstrainedBox(
+                            constraints:
+                                BoxConstraints(minHeight: constraint.maxHeight),
+                            child: IntrinsicHeight(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  _buildDisplayTextField(),
+                                  SizedBox(height: 10),
+                                  _buildAddressTextField(),
+                                  SizedBox(height: 10),
+                                  _buildEmailTextField(),
+                                  SizedBox(height: 10),
+                                  _buildPhoneTextField(),
+                                  SizedBox(height: 10),
+                                  _buildPasswordTextField(),
+                                  SizedBox(height: 10),
+                                  _buildButtonSignUp()
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                )),
-          ],
+                        );
+                      },
+                    )),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -86,7 +121,7 @@ class _SignUpContainerState extends State<SignUpContainer> {
       margin: EdgeInsets.only(left: 10, right: 10),
       child: TextField(
         maxLines: 1,
-        controller: _displayController,
+        controller: _displayNameController,
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -243,7 +278,25 @@ class _SignUpContainerState extends State<SignUpContainer> {
             child: ElevatedButton(
               child: Text("Register",
                   style: TextStyle(fontSize: 18, color: Colors.white)),
-              onPressed: () {},
+              onPressed: () {
+                String name = _displayNameController.text.toString();
+                String phone = _phoneController.text.toString();
+                String address = _addressController.text.toString();
+                String password = _passController.text.toString();
+                String email = _emailController.text.toString();
+
+                if (name.isNotEmpty && phone.isNotEmpty && address.isNotEmpty && password.isNotEmpty && email.isNotEmpty) {
+                  _bloc.eventSink.add(SignUpExecuteEvent(
+                      email: email,
+                      name: name,
+                      phone: phone,
+                      password: password,
+                      address: address));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Input empty")));
+                  return;
+                }
+              },
             )));
   }
 }

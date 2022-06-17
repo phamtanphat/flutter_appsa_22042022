@@ -103,7 +103,17 @@ class _SignInContainerState extends State<SignInContainer> {
             Text("Don't have an account!"),
             InkWell(
               onTap: () {
-                Navigator.pushNamed(context, "/sign-up");
+                Navigator
+                    .pushNamed(context, "/sign-up")
+                    .then((value){
+                       if (value != null) {
+                         String email = (value as Map)['email'];
+                         String password = (value)['password'];
+
+                         _emailController.value = TextEditingValue(text: email);
+                         _passController.value = TextEditingValue(text: password);
+                       }
+                    });
               },
               child: Text("Sign Up",
                   style: TextStyle(
