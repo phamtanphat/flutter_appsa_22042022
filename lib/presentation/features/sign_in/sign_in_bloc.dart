@@ -11,7 +11,7 @@ class SignInBloc extends BaseBloc {
   StreamController<String> message = StreamController();
   late AuthenticationRepository _authenticationRepository;
 
-  SignInBloc({required AuthenticationRepository authenticationRepository}) {
+  void setAuthenticationRepository({required AuthenticationRepository authenticationRepository}) {
     _authenticationRepository = authenticationRepository;
   }
 
@@ -23,6 +23,7 @@ class SignInBloc extends BaseBloc {
   }
 
   void _executeLogin(LoginEvent event) {
+    loadingSink.add(true);
     _authenticationRepository
         .login(email: event.email, password: event.password)
         .then((userResponse) {
@@ -31,8 +32,11 @@ class SignInBloc extends BaseBloc {
               name: userResponse.name ?? "",
               phone: userResponse.phone ?? "",
               token: userResponse.token ?? ""));
+          loadingSink.add(false);
+          progressSink.add(LoginSuccessEvent());
         }).catchError((error) {
           message.sink.add(error);
+          loadingSink.add(false);
         });
   }
 

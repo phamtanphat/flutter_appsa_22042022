@@ -13,3 +13,12 @@ class LoginEvent extends SignInEvent {
   List<Object?> get props => [];
 
 }
+
+class LoginSuccessEvent extends SignInEvent {
+
+  LoginSuccessEvent();
+
+  @override
+  List<Object?> get props => [];
+
+}

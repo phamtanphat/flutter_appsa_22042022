@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_appsa_22042022/common/bases/base_widget.dart';
+import 'package:flutter_appsa_22042022/common/widgets/loading_widget.dart';
+import 'package:flutter_appsa_22042022/common/widgets/progress_listener_widget.dart';
 import 'package:flutter_appsa_22042022/data/repositories/authentication_repository.dart';
+import 'package:flutter_appsa_22042022/presentation/features/sign_in/sign_in_bloc.dart';
+import 'package:flutter_appsa_22042022/presentation/features/sign_in/sign_in_event.dart';
+import 'package:provider/provider.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -13,7 +18,16 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return PageContainer(
-      providers: [],
+      providers: [
+        Provider(create: (context) => AuthenticationRepository()),
+        ProxyProvider<AuthenticationRepository,SignInBloc>(
+          create: (context) => SignInBloc(),
+          update: (context, repository, bloc) {
+            bloc!.setAuthenticationRepository(authenticationRepository: repository);
+            return bloc;
+          }
+        )
+      ],
       appBar: AppBar(
         title: Text("Sign In"),
       ),
@@ -33,38 +47,47 @@ class _SignInContainerState extends State<SignInContainer> {
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
   var isPassVisible = true;
+  late SignInBloc _bloc;
 
   @override
-  void didUpdateWidget(covariant SignInContainer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    AuthenticationRepository repository = AuthenticationRepository();
-
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _bloc = context.read();
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Container(
           color: Colors.white,
           constraints: BoxConstraints.expand(),
-          child: Column(
-            children: [
-              Expanded(
-                  flex: 2, child: Image.asset("assets/images/ic_hello_food.png")),
-              Expanded(
-                flex: 4,
-                child: Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildPhoneTextField(),
-                      _buildPasswordTextField(),
-                      _buildButtonSignIn(),
-                    ],
+          child: LoadingWidget(
+            bloc: _bloc,
+            child: ProgressListenerWidget<SignInBloc>(
+              callback: (event){
+                print(event.runtimeType);
+              },
+              child: Column(
+                children: [
+                  Expanded(
+                      flex: 2, child: Image.asset("assets/images/ic_hello_food.png")),
+                  Expanded(
+                    flex: 4,
+                    child: Container(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildPhoneTextField(),
+                          _buildPasswordTextField(),
+                          _buildButtonSignIn(),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                  Expanded(child: _buildTextSignUp())
+                ],
               ),
-              Expanded(child: _buildTextSignUp())
-            ],
+            ),
           ),
         )
     );
@@ -168,7 +191,17 @@ class _SignInContainerState extends State<SignInContainer> {
             child: ElevatedButton(
               child: Text("Login",
                   style: TextStyle(fontSize: 18, color: Colors.white)),
-              onPressed: () {},
+              onPressed: () {
+                String email = _emailController.text.toString();
+                String password = _passController.text.toString();
+
+                if (email.isEmpty || password.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Input empty")));
+                  return;
+                }
+
+                _bloc.eventSink.add(LoginEvent(email: email, password: password));
+              },
             )));
   }
 }
