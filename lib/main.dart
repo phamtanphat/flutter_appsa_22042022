@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_appsa_22042022/presentation/features/sign_in/sign_in_page.dart';
+import 'package:flutter_appsa_22042022/presentation/features/sign_up/sign_up_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +17,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       routes: {
-       "/sign-in": (context) => SignInPage()
+       "/sign-in": (context) => SignInPage(),
+       "/sign-up": (context) => SignUpPage(),
       },
       initialRoute: "/sign-in",
     );
