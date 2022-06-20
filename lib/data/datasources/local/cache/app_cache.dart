@@ -1,20 +1,22 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppCache {
-  static Future<SharedPreferences> get _instance async => _prefsInstance ??= await SharedPreferences.getInstance();
+  static AppCache instance = AppCache._internal();
   static SharedPreferences? _prefsInstance;
 
-  static Future<SharedPreferences> init() async {
-    _prefsInstance = await _instance;
-    return _prefsInstance!;
+  factory AppCache() {
+    SharedPreferences.getInstance().then((value) => _prefsInstance = value);
+    return instance;
   }
 
-  static String getString(String key, [String defValue = ""]) {
-    return _prefsInstance?.getString(key) ?? defValue;
+  AppCache._internal();
+
+  String getString({String key = ""}) {
+    return _prefsInstance?.getString(key) ?? "";
   }
 
-  static Future<bool> setString(String key, String value) async {
-    var prefs = await _instance;
-    return prefs.setString(key, value);
+  void setString({String key = "", String value = ""}) {
+    if (value.isEmpty || key.isEmpty) return;
+    _prefsInstance?.setString(key, value);
   }
 }

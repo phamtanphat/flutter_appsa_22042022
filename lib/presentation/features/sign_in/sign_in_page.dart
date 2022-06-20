@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_appsa_22042022/common/bases/base_widget.dart';
 import 'package:flutter_appsa_22042022/common/widgets/loading_widget.dart';
 import 'package:flutter_appsa_22042022/common/widgets/progress_listener_widget.dart';
+import 'package:flutter_appsa_22042022/data/datasources/local/cache/app_cache.dart';
 import 'package:flutter_appsa_22042022/data/repositories/authentication_repository.dart';
 import 'package:flutter_appsa_22042022/presentation/features/sign_in/sign_in_bloc.dart';
 import 'package:flutter_appsa_22042022/presentation/features/sign_in/sign_in_event.dart';
@@ -53,6 +54,8 @@ class _SignInContainerState extends State<SignInContainer> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _bloc = context.read();
+
+    AppCache().setString(key: "token", value: "123");
   }
 
   @override
