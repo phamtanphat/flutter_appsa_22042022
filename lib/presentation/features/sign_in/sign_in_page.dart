@@ -54,8 +54,6 @@ class _SignInContainerState extends State<SignInContainer> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _bloc = context.read();
-
-    AppCache().setString(key: "token", value: "123");
   }
 
   @override
@@ -68,7 +66,9 @@ class _SignInContainerState extends State<SignInContainer> {
             bloc: _bloc,
             child: ProgressListenerWidget<SignInBloc>(
               callback: (event){
-                print(event.runtimeType);
+                if (event is LoginSuccessEvent) {
+                  Navigator.pushReplacementNamed(context, '/home');
+                }
               },
               child: Column(
                 children: [

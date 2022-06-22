@@ -34,7 +34,7 @@ class SignInBloc extends BaseBloc {
               name: userResponse.name ?? "",
               phone: userResponse.phone ?? "",
               token: userResponse.token ?? ""));
-          AppCache()..setString(key: VariableConstant.TOKEN, value: userResponse.token!);
+          AppCache.setString(key: VariableConstant.TOKEN, value: userResponse.token!);
           loadingSink.add(false);
           progressSink.add(LoginSuccessEvent());
         }).catchError((error) {

@@ -13,8 +13,8 @@ class _SplashPageState extends State<SplashPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     Future.delayed(Duration(seconds: 2),() {
-      AppCache appCache = AppCache();
-      String token = appCache.getString(key: VariableConstant.TOKEN);
+      String token = AppCache.getString(VariableConstant.TOKEN);
+      print("token: $token");
       if (token.isNotEmpty) {
         Navigator.pushReplacementNamed(context, '/home');
       } else {
