@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_appsa_22042022/common/bases/base_bloc.dart';
 import 'package:flutter_appsa_22042022/common/bases/base_event.dart';
+import 'package:flutter_appsa_22042022/common/constants/variable_constant.dart';
 import 'package:flutter_appsa_22042022/data/datasources/local/cache/app_cache.dart';
 import 'package:flutter_appsa_22042022/data/datasources/models/user_model.dart';
 import 'package:flutter_appsa_22042022/data/repositories/authentication_repository.dart';
@@ -33,6 +34,7 @@ class SignInBloc extends BaseBloc {
               name: userResponse.name ?? "",
               phone: userResponse.phone ?? "",
               token: userResponse.token ?? ""));
+          AppCache()..setString(key: VariableConstant.TOKEN, value: userResponse.token!);
           loadingSink.add(false);
           progressSink.add(LoginSuccessEvent());
         }).catchError((error) {
