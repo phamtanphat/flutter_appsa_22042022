@@ -3,5 +3,5 @@ class ApiConstant {
 
   static final String SIGN_IN_API = "user/sign-in";
   static final String SIGN_UP_API = "user/sign-up";
-  static final String LIST_PRODUCTS = "product";
+  static final String LIST_PRODUCTS_API = "product";
 }

@@ -14,8 +14,8 @@ class ProductRepository {
 
   Future<List<ProductResponse>> fetchListProducts() {
     Completer<List<ProductResponse>> completer = Completer();
-    _dio.get(ApiConstant.SIGN_IN_API).then((response){
-      AppResponse<List<ProductResponse>> dataResponse = AppResponse.fromJson(response.data, ProductResponse.parseJson);
+    _dio.get(ApiConstant.LIST_PRODUCTS_API).then((response){
+      AppResponse<List<ProductResponse>> dataResponse = AppResponse.fromJson(response.data, ProductResponse.pareJsonModelToList);
       completer.complete(dataResponse.data);
     }).catchError((error) {
       if (error is DioError) {

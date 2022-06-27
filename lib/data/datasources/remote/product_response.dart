@@ -77,5 +77,8 @@ class ProductResponse {
     return 'ProductResponse{_id: $_id, _name: $_name, _address: $_address, _price: $_price, _img: $_img, _quantity: $_quantity, _gallery: $_gallery}';
   }
 
-  static ProductResponse parseJson(Map<String, dynamic> json) => ProductResponse.fromJson(json);
+  static List<ProductResponse> pareJsonModelToList(List lst){
+    List<ProductResponse> data = lst.map((json) => ProductResponse.fromJson(json)).toList();
+    return data;
+  }
 }
