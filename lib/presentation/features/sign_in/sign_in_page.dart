@@ -54,6 +54,12 @@ class _SignInContainerState extends State<SignInContainer> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _bloc = context.read();
+    _bloc.message.stream.listen((event) {
+      if (event.isNotEmpty) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(event)));
+      }
+    });
   }
 
   @override

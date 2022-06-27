@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_appsa_22042022/common/constants/variable_constant.dart';
 import 'package:flutter_appsa_22042022/data/datasources/local/cache/app_cache.dart';
+import 'package:lottie/lottie.dart';
 class SplashPage extends StatefulWidget {
 
   @override
@@ -32,8 +33,8 @@ class _SplashPageState extends State<SplashPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // Lottie.asset('assets/animations/animation_splash.json',
-            //     animate: true, repeat: true),
+            Lottie.asset('assets/animations/animation_splash.json',
+                animate: true, repeat: true),
             Text("Welcome",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
