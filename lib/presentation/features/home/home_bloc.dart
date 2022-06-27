@@ -23,6 +23,7 @@ class HomeBloc extends BaseBloc {
   }
 
   void fetchProducts() {
+    loadingSink.add(true);
     _productRepository
         .fetchListProducts()
         .then((listProducts) {
@@ -36,7 +37,8 @@ class HomeBloc extends BaseBloc {
                 productResponse.quantity,
                 productResponse.gallery);
           }).toList());})
-        .catchError((e) { message.sink.add(e); });
+        .catchError((e) { message.sink.add(e); })
+        .whenComplete(() => loadingSink.add(false));
   }
 
   @override
