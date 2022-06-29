@@ -83,7 +83,6 @@ class _HomeContainerState extends State<HomeContainer> {
   }
 
   Widget _buildItemFood(ProductModel? product) {
-    print(product?.img.toString());
     if (product == null) return Container();
     return Container(
       height: 135,
