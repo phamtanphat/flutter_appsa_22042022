@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_appsa_22042022/common/bases/base_widget.dart';
 import 'package:flutter_appsa_22042022/common/constants/api_constant.dart';
 import 'package:flutter_appsa_22042022/common/widgets/loading_widget.dart';
+import 'package:flutter_appsa_22042022/data/datasources/models/cart_model.dart';
 import 'package:flutter_appsa_22042022/data/datasources/models/product_model.dart';
+import 'package:flutter_appsa_22042022/data/repositories/cart_repository.dart';
 import 'package:flutter_appsa_22042022/data/repositories/product_repository.dart';
 import 'package:flutter_appsa_22042022/presentation/features/home/home_bloc.dart';
 import 'package:intl/intl.dart';
@@ -27,27 +29,49 @@ class _HomePageState extends State<HomePage> {
     return PageContainer(
       providers: [
         Provider(create: (context) => ProductRepository()),
-        ProxyProvider<ProductRepository, HomeBloc>(
+        Provider(create: (context) => CartRepository()),
+        ProxyProvider2<ProductRepository, CartRepository,HomeBloc>(
             create: (context) => HomeBloc(),
-            update: (context, repository, bloc) {
-              bloc!.setProductRepository(productRepository: repository);
+            update: (context, productRepo, cartRepo, bloc) {
+              bloc!.setRepository(productRepository: productRepo, cartRepository: cartRepo);
               return bloc;
             })
       ],
       appBar: AppBar(
         title: Text("Product"),
         actions: [
-          InkWell(
-            onTap: (){
-                Navigator.pushNamed(context, "/cart");
-            },
-            child: Container(
-              margin: EdgeInsets.only(right: 10, top: 10),
-              child: Badge(
-                badgeContent: Text("0"),
-                child: Icon(Icons.shopping_cart_outlined),
-              ),
-            ),
+          Consumer<HomeBloc>(
+            builder: (context, bloc, child) {
+              return InkWell(
+                onTap: (){
+                  Navigator.pushNamed(context, "/cart");
+                },
+                child: StreamBuilder<CartModel>(
+                  initialData: null,
+                  stream: bloc.cart.stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError || snapshot.data == null) {
+                      return Container();
+                    }
+                    String? count = snapshot.data?.products?.length.toString();
+                    if (count == null || count.isEmpty || count == "0") {
+                      return Container(
+                        margin: EdgeInsets.only(right: 10, top: 10),
+                        child: Icon(Icons.shopping_cart_outlined),
+                      );
+                    } else {
+                      return Container(
+                        margin: EdgeInsets.only(right: 10, top: 10),
+                        child: Badge(
+                          badgeContent: Text(count),
+                          child: Icon(Icons.shopping_cart_outlined),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              );
+            }
           ),
         ],
       ),
@@ -71,6 +95,7 @@ class _HomeContainerState extends State<HomeContainer> {
     super.didChangeDependencies();
     homeBloc = context.read();
     homeBloc.fetchProducts();
+    homeBloc.fetchCart();
   }
 
   @override

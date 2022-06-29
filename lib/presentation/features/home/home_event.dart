@@ -7,3 +7,9 @@ class FetchProductsEvent extends HomeEvent {
   @override
   List<Object?> get props => [];
 }
+
+class FetchCartEvent extends HomeEvent {
+
+  @override
+  List<Object?> get props => [];
+}
