@@ -10,7 +10,7 @@ import 'package:flutter_appsa_22042022/presentation/features/home/home_event.dar
 
 class HomeBloc extends BaseBloc {
   StreamController<List<ProductModel>> products = StreamController();
-  StreamController<CartModel> cart = StreamController();
+  StreamController<CartModel> cart = StreamController.broadcast();
   StreamController<String> message = StreamController();
   late ProductRepository _productRepository;
   late CartRepository _cartRepository;
@@ -26,6 +26,8 @@ class HomeBloc extends BaseBloc {
       fetchProducts();
     } else if (event is FetchCartEvent) {
       fetchCart();
+    } else if (event is AddCartEvent) {
+      addCart(event);
     }
   }
 
@@ -64,6 +66,27 @@ class HomeBloc extends BaseBloc {
             productResponse.gallery);
       }).toList());
     }).catchError((e) {
+      message.sink.add(e);
+    }).whenComplete(() => loadingSink.add(false));
+  }
+
+  void addCart(AddCartEvent event) {
+    loadingSink.add(true);
+    _cartRepository
+        .addCart(event.idProduct)
+        .then((cartData) => cart.sink.add(CartModel(
+          cartData.id,
+          cartData.products?.map((model) => ProductModel(
+              model.id,
+              model.name,
+              model.address,
+              model.price,
+              model.img,
+              model.quantity,
+              model.gallery))
+              .toList(),
+          cartData.price)))
+        .catchError((e) {
       message.sink.add(e);
     }).whenComplete(() => loadingSink.add(false));
   }

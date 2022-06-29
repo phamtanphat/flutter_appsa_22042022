@@ -18,6 +18,8 @@ class CartResponse {
       json['products'].forEach((v) {
         _products?.add(ProductResponse.fromJson(v));
       });
+    } else {
+      _products = [];
     }
     _price = json['price'];
   }

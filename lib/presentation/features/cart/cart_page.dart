@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_appsa_22042022/common/bases/base_widget.dart';
 import 'package:flutter_appsa_22042022/common/constants/api_constant.dart';
+import 'package:flutter_appsa_22042022/data/datasources/models/cart_model.dart';
 import 'package:flutter_appsa_22042022/data/datasources/models/product_model.dart';
 import 'package:intl/intl.dart';
 
@@ -25,9 +26,13 @@ class CartContainer extends StatefulWidget {
 }
 
 class _CartContainerState extends State<CartContainer> {
+  CartModel? _cartModel;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    var dataReceive = ModalRoute.of(context)?.settings.arguments as Map;
+    _cartModel = dataReceive["cart"];
   }
 
   @override
@@ -37,8 +42,8 @@ class _CartContainerState extends State<CartContainer> {
         children: [
           Expanded(
             child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (lstContext, index) => _buildItem(ProductModel("62b72b165e4e6e6e3c6a81e6", "A Chảy - Mì Sủi Cảo & Cơm Chiên Gà Xối Mỡ - Shop Online", "58/11 Nguyễn Văn Săng, P. Tân Sơn Nhì, Tân Phú, TP. HCM", 30000, "assets/images/achay/banner.jpg", 0, ["assets/images/achay/img1.jpg"]))),
+                itemCount: _cartModel?.products?.length,
+                itemBuilder: (lstContext, index) => _buildItem(_cartModel?.products?[index])),
           ),
           Container(
               margin: EdgeInsets.symmetric(vertical: 10),
@@ -49,7 +54,7 @@ class _CartContainerState extends State<CartContainer> {
               child: Text(
                   "Tổng tiền : " +
                       NumberFormat("#,###", "en_US")
-                          .format(0) +
+                          .format(_cartModel?.price) +
                       " đ",
                   style: TextStyle(fontSize: 25, color: Colors.white))),
           Container(
@@ -68,7 +73,7 @@ class _CartContainerState extends State<CartContainer> {
     );
   }
 
-  Widget _buildItem(ProductModel product) {
+  Widget _buildItem(ProductModel? product) {
     return Container(
       height: 135,
       child: Card(
@@ -83,7 +88,7 @@ class _CartContainerState extends State<CartContainer> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(5),
                   child: Image.network(
-                      ApiConstant.BASE_URL + product.img.toString(),
+                      ApiConstant.BASE_URL + (product?.img).toString(),
                       width: 150,
                       height: 120,
                       fit: BoxFit.fill),
@@ -98,7 +103,7 @@ class _CartContainerState extends State<CartContainer> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
-                        child: Text(product.name.toString(),
+                        child: Text((product?.name).toString(),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontSize: 16)),
@@ -106,7 +111,7 @@ class _CartContainerState extends State<CartContainer> {
                       Text(
                           "Giá : " +
                               NumberFormat("#,###", "en_US")
-                                  .format(product.price) +
+                                  .format(product?.price) +
                               " đ",
                           style: TextStyle(fontSize: 12)),
                       Row(
@@ -117,7 +122,7 @@ class _CartContainerState extends State<CartContainer> {
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Text(product.quantity.toString(),
+                            child: Text((product?.quantity).toString(),
                                 style: TextStyle(fontSize: 16)),
                           ),
                           ElevatedButton(

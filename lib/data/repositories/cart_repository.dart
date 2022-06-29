@@ -27,4 +27,22 @@ class CartRepository {
     });
     return completer.future;
   }
+
+  Future<CartResponse> addCart(String idProduct) {
+    Completer<CartResponse> completer = Completer();
+    _dio.post(ApiConstant.ADD_CART,  data: {
+          "id_product": idProduct
+        })
+        .then((response){
+          AppResponse<CartResponse> dataResponse = AppResponse.fromJson(response.data, CartResponse.parseJson);
+          completer.complete(dataResponse.data);
+        }).catchError((error) {
+          if (error is DioError) {
+            completer.completeError((error).response?.data["message"]);
+          } else {
+            completer.completeError(error);
+          }
+        });
+    return completer.future;
+  }
 }

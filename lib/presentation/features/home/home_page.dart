@@ -8,6 +8,7 @@ import 'package:flutter_appsa_22042022/data/datasources/models/product_model.dar
 import 'package:flutter_appsa_22042022/data/repositories/cart_repository.dart';
 import 'package:flutter_appsa_22042022/data/repositories/product_repository.dart';
 import 'package:flutter_appsa_22042022/presentation/features/home/home_bloc.dart';
+import 'package:flutter_appsa_22042022/presentation/features/home/home_event.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  CartModel? _cart;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -44,7 +46,7 @@ class _HomePageState extends State<HomePage> {
             builder: (context, bloc, child) {
               return InkWell(
                 onTap: (){
-                  Navigator.pushNamed(context, "/cart");
+                  Navigator.pushNamed(context, "/cart",arguments: {"cart": _cart});
                 },
                 child: StreamBuilder<CartModel>(
                   initialData: null,
@@ -53,6 +55,7 @@ class _HomePageState extends State<HomePage> {
                     if (snapshot.hasError || snapshot.data == null) {
                       return Container();
                     }
+                    _cart = snapshot.data;
                     String? count = snapshot.data?.products?.length.toString();
                     if (count == null || count.isEmpty || count == "0") {
                       return Container(
@@ -158,7 +161,9 @@ class _HomeContainerState extends State<HomeContainer> {
                               " đ",
                           style: TextStyle(fontSize: 12)),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          homeBloc.eventSink.add(AddCartEvent(idProduct: product.id));
+                        },
                         style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.resolveWith((states) {
