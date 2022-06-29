@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_appsa_22042022/common/bases/base_widget.dart';
 import 'package:flutter_appsa_22042022/common/constants/api_constant.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_appsa_22042022/data/repositories/product_repository.dart
 import 'package:flutter_appsa_22042022/presentation/features/home/home_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -15,7 +17,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -26,16 +27,29 @@ class _HomePageState extends State<HomePage> {
     return PageContainer(
       providers: [
         Provider(create: (context) => ProductRepository()),
-        ProxyProvider<ProductRepository,HomeBloc>(
+        ProxyProvider<ProductRepository, HomeBloc>(
             create: (context) => HomeBloc(),
             update: (context, repository, bloc) {
               bloc!.setProductRepository(productRepository: repository);
               return bloc;
-            }
-        )
+            })
       ],
       appBar: AppBar(
         title: Text("Product"),
+        actions: [
+          InkWell(
+            onTap: (){
+                Navigator.pushNamed(context, "/cart");
+            },
+            child: Container(
+              margin: EdgeInsets.only(right: 10, top: 10),
+              child: Badge(
+                badgeContent: Text("0"),
+                child: Icon(Icons.shopping_cart_outlined),
+              ),
+            ),
+          ),
+        ],
       ),
       child: HomeContainer(),
     );
@@ -58,6 +72,7 @@ class _HomeContainerState extends State<HomeContainer> {
     homeBloc = context.read();
     homeBloc.fetchProducts();
   }
+
   @override
   Widget build(BuildContext context) {
     return LoadingWidget(
@@ -68,7 +83,7 @@ class _HomeContainerState extends State<HomeContainer> {
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text("Data is error");
-            } else if (snapshot.hasData){
+            } else if (snapshot.hasData) {
               return ListView.builder(
                   itemCount: snapshot.data?.length ?? 0,
                   itemBuilder: (context, index) {
@@ -77,8 +92,7 @@ class _HomeContainerState extends State<HomeContainer> {
             } else {
               return Container();
             }
-          }
-      ),
+          }),
     );
   }
 
@@ -119,12 +133,10 @@ class _HomeContainerState extends State<HomeContainer> {
                               " đ",
                           style: TextStyle(fontSize: 12)),
                       ElevatedButton(
-                        onPressed: () {
-
-                        },
+                        onPressed: () {},
                         style: ButtonStyle(
                             backgroundColor:
-                            MaterialStateProperty.resolveWith((states) {
+                                MaterialStateProperty.resolveWith((states) {
                               if (states.contains(MaterialState.pressed)) {
                                 return Color.fromARGB(200, 240, 102, 61);
                               } else {
@@ -136,7 +148,7 @@ class _HomeContainerState extends State<HomeContainer> {
                                     borderRadius: BorderRadius.all(
                                         Radius.circular(10))))),
                         child:
-                        Text("Add To Cart", style: TextStyle(fontSize: 14)),
+                            Text("Add To Cart", style: TextStyle(fontSize: 14)),
                       ),
                     ],
                   ),
@@ -149,4 +161,3 @@ class _HomeContainerState extends State<HomeContainer> {
     );
   }
 }
-
