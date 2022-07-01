@@ -42,6 +42,12 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text("Product"),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, "/order-history");
+            },
+            icon: Icon(Icons.description)
+          ),
           Consumer<HomeBloc>(
             builder: (context, bloc, child) {
               return InkWell(

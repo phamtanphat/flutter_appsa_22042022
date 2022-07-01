@@ -30,7 +30,7 @@ class CartRepository {
 
   Future<CartResponse> addCart(String idProduct) {
     Completer<CartResponse> completer = Completer();
-    _dio.post(ApiConstant.ADD_CART,  data: {
+    _dio.post(ApiConstant.ADD_CART_API,  data: {
           "id_product": idProduct
         })
         .then((response){
