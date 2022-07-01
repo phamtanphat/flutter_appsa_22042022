@@ -22,6 +22,8 @@ class CartBloc extends BaseBloc {
       fetchCart();
     } else if (event is UpdateCartEvent) {
       updateCart(event);
+    } else if (event is CartConform) {
+      conform(event);
     }
   }
 
@@ -50,6 +52,15 @@ class CartBloc extends BaseBloc {
                 data.img, data.quantity, data.gallery);
           }).toList(),
           cartData.price));
+    }).catchError((e) {
+      message.sink.add(e);
+    }).whenComplete(() => loadingSink.add(false));
+  }
+
+  void conform(CartConform event) {
+    loadingSink.add(true);
+    _cartRepository.confirm(event.idCart).then((cartData) {
+      cart.sink.add(CartModel("", [], -1));
     }).catchError((e) {
       message.sink.add(e);
     }).whenComplete(() => loadingSink.add(false));

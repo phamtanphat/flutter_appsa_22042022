@@ -71,10 +71,10 @@ class _CartContainerState extends State<CartContainer> {
               }
 
               if (snapshot.hasData) {
+                _cartModel = snapshot.data;
                 if (snapshot.data == null || snapshot.data!.products!.isEmpty) {
                   return Text("Data empty");
                 }
-                _cartModel = snapshot.data;
                 return Column(
                   children: [
                     Expanded(
@@ -98,7 +98,12 @@ class _CartContainerState extends State<CartContainer> {
                         margin: EdgeInsets.only(bottom: 10),
                         padding: EdgeInsets.all(10),
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            if (_cartModel != null) {
+                              String idCart = _cartModel!.id ??= "";
+                              _bloc.eventSink.add(CartConform(idCart: idCart));
+                            }
+                          },
                           style: ButtonStyle(
                               backgroundColor:
                               MaterialStateProperty.all(Colors.deepOrange)),
