@@ -20,11 +20,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  CartModel? _cart;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +47,13 @@ class _HomePageState extends State<HomePage> {
             builder: (context, bloc, child) {
               return InkWell(
                 onTap: (){
-                  Navigator.pushNamed(context, "/cart",arguments: {"cart": _cart});
+                  Navigator
+                      .pushNamed(context, "/cart")
+                      .then((cartModelUpdate){
+                        if (cartModelUpdate != null) {
+                          bloc.cart.sink.add(cartModelUpdate as CartModel);
+                        }
+                      });
                 },
                 child: StreamBuilder<CartModel>(
                   initialData: null,
@@ -61,7 +62,7 @@ class _HomePageState extends State<HomePage> {
                     if (snapshot.hasError || snapshot.data == null) {
                       return Container();
                     }
-                    _cart = snapshot.data;
+
                     String? count = snapshot.data?.products?.length.toString();
                     if (count == null || count.isEmpty || count == "0") {
                       return Container(

@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_appsa_22042022/common/bases/base_widget.dart';
 import 'package:flutter_appsa_22042022/common/constants/api_constant.dart';
+import 'package:flutter_appsa_22042022/common/widgets/loading_widget.dart';
 import 'package:flutter_appsa_22042022/data/datasources/models/cart_model.dart';
 import 'package:flutter_appsa_22042022/data/datasources/models/product_model.dart';
+import 'package:flutter_appsa_22042022/data/repositories/cart_repository.dart';
+import 'package:flutter_appsa_22042022/presentation/features/cart/cart_bloc.dart';
+import 'package:flutter_appsa_22042022/presentation/features/cart/cart_event.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageContainer(
-      providers: [],
+      providers: [
+        Provider(create: (context) => CartRepository()),
+        Provider(create: (context) => CartBloc()),
+        ProxyProvider<CartRepository,CartBloc>(
+            create: (context) => CartBloc(),
+            update: (context, cartRepo, bloc) {
+              bloc!.setRepository(cartRepository: cartRepo);
+              return bloc;
+            })
+      ],
       appBar: AppBar(
         title: Text("Cart"),
       ),
@@ -27,48 +41,78 @@ class CartContainer extends StatefulWidget {
 
 class _CartContainerState extends State<CartContainer> {
   CartModel? _cartModel;
+  late CartBloc _bloc;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    var dataReceive = ModalRoute.of(context)?.settings.arguments as Map;
-    _cartModel = dataReceive["cart"];
+    _bloc = context.read();
+    _bloc.eventSink.add(FetchCartEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-                itemCount: _cartModel?.products?.length,
-                itemBuilder: (lstContext, index) => _buildItem(_cartModel?.products?[index])),
+    return WillPopScope(
+      onWillPop: () async{
+        Navigator.pop(context, _cartModel);
+        return true;
+      },
+      child: LoadingWidget(
+        bloc: _bloc,
+        child: Center(
+          child: StreamBuilder<CartModel>(
+            stream: _bloc.cart.stream,
+            initialData: null,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text("${snapshot.error.toString()}"),
+                );
+              }
+
+              if (snapshot.hasData) {
+                if (snapshot.data == null || snapshot.data!.products!.isEmpty) {
+                  return Text("Data empty");
+                }
+                _cartModel = snapshot.data;
+                return Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                          itemCount: snapshot.data?.products?.length,
+                          itemBuilder: (lstContext, index) => _buildItem(snapshot.data?.products?[index])),
+                    ),
+                    Container(
+                        margin: EdgeInsets.symmetric(vertical: 10),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            color: Colors.teal,
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        child: Text(
+                            "Tổng tiền : " +
+                                NumberFormat("#,###", "en_US")
+                                    .format(_cartModel?.price) +
+                                " đ",
+                            style: TextStyle(fontSize: 25, color: Colors.white))),
+                    Container(
+                        margin: EdgeInsets.only(bottom: 10),
+                        padding: EdgeInsets.all(10),
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ButtonStyle(
+                              backgroundColor:
+                              MaterialStateProperty.all(Colors.deepOrange)),
+                          child: Text("Confirm",
+                              style: TextStyle(color: Colors.white, fontSize: 25)),
+                        )),
+                  ],
+                );
+              }
+
+              return Container();
+            },
           ),
-          Container(
-              margin: EdgeInsets.symmetric(vertical: 10),
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: Colors.teal,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: Text(
-                  "Tổng tiền : " +
-                      NumberFormat("#,###", "en_US")
-                          .format(_cartModel?.price) +
-                      " đ",
-                  style: TextStyle(fontSize: 25, color: Colors.white))),
-          Container(
-              margin: EdgeInsets.only(bottom: 10),
-              padding: EdgeInsets.all(10),
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ButtonStyle(
-                    backgroundColor:
-                    MaterialStateProperty.all(Colors.deepOrange)),
-                child: Text("Confirm",
-                    style: TextStyle(color: Colors.white, fontSize: 25)),
-              )),
-        ],
+        ),
       ),
     );
   }
@@ -117,7 +161,14 @@ class _CartContainerState extends State<CartContainer> {
                       Row(
                         children: [
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              if (product != null && _cartModel != null ) {
+                                String cartId = _cartModel!.id ??= "";
+                                if (cartId.isNotEmpty) {
+                                  _bloc.eventSink.add(UpdateCartEvent(idCart: cartId, idProduct: product.id, quantity: product.quantity - 1));
+                                }
+                              }
+                            },
                             child: Text("-"),
                           ),
                           Padding(
@@ -126,7 +177,14 @@ class _CartContainerState extends State<CartContainer> {
                                 style: TextStyle(fontSize: 16)),
                           ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              if (product != null && _cartModel != null ) {
+                                String cartId = _cartModel!.id ??= "";
+                                if (cartId.isNotEmpty) {
+                                  _bloc.eventSink.add(UpdateCartEvent(idCart: cartId, idProduct: product.id, quantity: product.quantity + 1));
+                                }
+                              }
+                            },
                             child: Text("+"),
                           ),
                         ],
